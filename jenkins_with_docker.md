@@ -2,7 +2,7 @@
 
 ### **Jenkins: run from docker, test on docker**
 ### **Purpose:**
-The purpose of this setup is to create a docker image with jenkins and docker inside the image, which would be able to create new containers on the running host using shared socked files in order to build and test software in a docker environment.
+The purpose is to create a docker image that will contain Jenkins and Docker, The Docker host sockets will be shared as a volume with the container, this will allow Jenkins to test/build/deploy containers using the Docker host.
 
 ### git clone this repository https://github.com/jenkinsci/docker.git
 ___
