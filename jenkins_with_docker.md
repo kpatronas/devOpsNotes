@@ -114,3 +114,8 @@ $ docker run -p 8080:8080 -p 50000:50000 -v /var/jenkins_home:/var/jenkins_home 
 ### Plugins to install
 ___
 In order to complete the setup you need to install the ```CloudBees Docker Build and Publish plugin```
+
+### Jenkins pipeline example
+___
+Here you can find a repository that can be used as a template to test / build / Push to dockerhub Python projects using Docker
+https://github.com/kpatronas/dockerfile-jenkinsfile-demo
