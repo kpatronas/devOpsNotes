@@ -1,0 +1,68 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Tested environment
+# OS: ubuntu 18.04
+# Hypervisor: virtualbox
+# Box: centos/7
+# vagrant version:
+# vagrant hostmanager plugin version:
+
+NETWORK = "192.168.50."
+NETMASK = "255.255.255.0" 
+
+# VM machines configuration
+# ip address of the vm is NETWORK plus the last part of the IP
+HOSTS = {
+  #VM_NAME       IP_ADDRESS    RAM(mb)  GUI    BOX
+   "slave01" => [NETWORK+"10", 512,     false, 'centos/7'],
+   "slave02" => [NETWORK+"11", 512,     false, 'centos/7'],
+}
+
+# A trick to read your SSH public key
+# Then the public key is appended to /home/vagrant/.ssh/authorized_keys of the VM
+ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+
+Vagrant.configure("2") do |config|
+
+  # Those are options for the hostmanager plugin
+  # hostmanager add records to /etc/hosts to enable
+  # guests to guests and host to guests communication with hostnames
+  # Options
+  # To enable the plugin
+  config.hostmanager.enabled           = true
+  # To enable add records to host /etc/hosts
+  config.hostmanager.manage_host       = true
+  # To enable add records to guest /etc/hosts
+  config.hostmanager.manage_guest      = true
+  # Not use private ip addresses for the hosts file, set to false
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline   = true
+
+  HOSTS.each do |(name, cfg)|
+    ipaddr, ram, gui, box = cfg
+
+    if ARGV[0] != 'destroy'
+       config.vm.provision 'shell', inline: "echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys", privileged: false
+    end
+
+    config.vm.define name do |machine|
+       machine.vm.box = box
+       machine.vm.provider "virtualbox" do |vbox|
+          vbox.gui    = gui
+          vbox.memory = ram
+          vbox.name   = name
+       end
+       machine.vm.hostname = name
+
+       # Deleting entries from known_hosts on 'destroy'
+       if ARGV[0] == 'destroy'
+          puts("Deleting entries from known_hosts")
+          system("ssh-keygen -f #{Dir.home}/.ssh/known_hosts -R '#{name}'")
+          system("ssh-keygen -R #{ipaddr}")
+       end
+       machine.vm.network 'private_network', ip: ipaddr, netmask: NETMASK
+    end
+  end
+
+end
