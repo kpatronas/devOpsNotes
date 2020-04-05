@@ -1,13 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Tested environment
-# OS: ubuntu 18.04
-# Hypervisor: virtualbox
-# Box: centos/7
-# vagrant version:
-# vagrant hostmanager plugin version:
-
 NETWORK = "192.168.50."
 NETMASK = "255.255.255.0" 
 
